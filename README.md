@@ -27,6 +27,17 @@ export AZDO_TOKEN="..."
   --output ./exported-wiki
 ```
 
+For Azure DevOps Server, specify the API base URL through the collection, before the project segment. For example:
+
+```sh
+./wiki-cli \
+  --organization DefaultCollection \
+  --project my-project \
+  --base-url https://ado.example.com/tfs/DefaultCollection
+```
+
+`--base-url` defaults to `https://dev.azure.com/<organization>`. When provided, it is used as-is (without a trailing slash) as the prefix before `/<project>/_apis/...`; `--organization` remains the organization or collection identifier recorded in the export manifest.
+
 The app exports the selected start page and its subpages, preserving their wiki paths in the output. `--start-page` defaults to `/` to export the full wiki. The output directory defaults to `./exported-wiki`; use `--output` to choose a different location. Existing contents of that directory are deleted before each export, so choose a directory that contains no files you want to keep.
 
 A page such as `/Guides/Setup` is written to `exported-wiki/Guides/Setup.md`. The root page is written to `_index.md`. Images referenced by absolute URLs are downloaded alongside their page, and `.wiki-cli.json` records source paths, ordering, ETags, images, and failures.

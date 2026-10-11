@@ -14,6 +14,9 @@ func TestRunHelpReturnsSuccess(t *testing.T) {
 	if !strings.Contains(stderr.String(), `Output directory (default "./exported-wiki")`) {
 		t.Fatalf("help does not show the output directory default: %s", stderr.String())
 	}
+	if !strings.Contains(stderr.String(), "Azure DevOps API base URL before the project path") {
+		t.Fatalf("help does not show the base URL option: %s", stderr.String())
+	}
 }
 
 func TestSelectWiki(t *testing.T) {

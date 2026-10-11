@@ -25,7 +25,22 @@ type AzureDevOpsClient struct {
 }
 
 func NewAzureDevOpsClient(organization, token string) *AzureDevOpsClient {
-	return newAzureDevOpsClient(organization, token, "https://dev.azure.com/"+url.PathEscape(organization))
+	return NewAzureDevOpsClientWithBaseURL(organization, token, "https://dev.azure.com/"+url.PathEscape(organization))
+}
+
+func NewAzureDevOpsClientWithBaseURL(organization, token, baseURL string) *AzureDevOpsClient {
+	return newAzureDevOpsClient(organization, token, baseURL)
+}
+
+func normalizeAzureDevOpsBaseURL(baseURL string) (string, error) {
+	parsed, err := url.Parse(baseURL)
+	if err != nil {
+		return "", fmt.Errorf("invalid Azure DevOps base URL: %w", err)
+	}
+	if (parsed.Scheme != "http" && parsed.Scheme != "https") || parsed.Host == "" || parsed.User != nil || parsed.RawQuery != "" || parsed.Fragment != "" {
+		return "", fmt.Errorf("Azure DevOps base URL must be an absolute HTTP(S) URL without credentials, query, or fragment")
+	}
+	return strings.TrimRight(parsed.String(), "/"), nil
 }
 
 func newAzureDevOpsClient(organization, token, baseURL string) *AzureDevOpsClient {

@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"net/url"
 	"os"
 )
 
@@ -14,6 +15,7 @@ func run(args []string, stdout, stderr io.Writer) int {
 	organization := flags.String("organization", "", "Azure DevOps organization")
 	project := flags.String("project", "", "Azure DevOps project")
 	wikiName := flags.String("wiki", "", "Wiki name or ID. Required when the project has multiple enabled wikis.")
+	baseURL := flags.String("base-url", "", "Azure DevOps API base URL before the project path (default https://dev.azure.com/<organization>)")
 	startPage := flags.String("start-page", "/", "Wiki page path to export, including its subpages")
 	output := flags.String("output", "./exported-wiki", "Output directory")
 	rootFilename := flags.String("root-filename", "_index.md", "Filename for the root wiki page")
@@ -27,13 +29,22 @@ func run(args []string, stdout, stderr io.Writer) int {
 		fmt.Fprintln(stderr, "--organization and --project are required")
 		return 2
 	}
+	apiBaseURL := "https://dev.azure.com/" + url.PathEscape(*organization)
+	if *baseURL != "" {
+		var err error
+		apiBaseURL, err = normalizeAzureDevOpsBaseURL(*baseURL)
+		if err != nil {
+			fmt.Fprintln(stderr, err)
+			return 2
+		}
+	}
 	token := os.Getenv("AZDO_TOKEN")
 	if token == "" {
 		fmt.Fprintln(stderr, "AZDO_TOKEN is required")
 		return 2
 	}
 
-	client := NewAzureDevOpsClient(*organization, token)
+	client := NewAzureDevOpsClientWithBaseURL(*organization, token, apiBaseURL)
 	wikis, err := client.ListWikis(*project)
 	if err != nil {
 		fmt.Fprintln(stderr, err)
