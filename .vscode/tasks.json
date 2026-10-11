@@ -1,0 +1,19 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Build wiki-cli",
+			"type": "shell",
+			"command": "go",
+			"args": [
+				"build",
+				"-o",
+				"wiki-cli",
+				"."
+			],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		}
+	]
+}

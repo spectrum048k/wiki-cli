@@ -2,6 +2,8 @@
 # https://github.com/github/gitignore/blob/main/community/Golang/Go.AllowList.gitignore
 #
 # Binaries for programs and plugins
+wiki-cli
+wiki-cli-*
 *.exe
 *.exe~
 *.dll
@@ -27,6 +29,9 @@ go.work.sum
 
 # env file
 .env
+
+# Wiki export output
+exported-wiki/
 
 # Editor/IDE
 # .idea/
