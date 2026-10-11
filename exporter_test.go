@@ -103,14 +103,24 @@ func TestExportWikiFromPageIncludesOnlySelectedPageAndDescendants(t *testing.T) 
 	client := newAzureDevOpsClient("org", "token", server.URL)
 	client.httpClient = server.Client()
 	output := t.TempDir()
-	manifest, err := ExportWikiFromPage(client, "project", Wiki{ID: "wiki-id", Name: "Docs"}, "/Guides/Start", output, "_index.md", nil)
+	var exportedPaths []string
+	manifest, err := ExportWikiFromPage(client, "project", Wiki{ID: "wiki-id", Name: "Docs"}, "/Guides/Start", output, "_index.md", func(_ Page, localPath string) {
+		exportedPaths = append(exportedPaths, localPath)
+	})
 	if err != nil {
 		t.Fatal(err)
 	}
 	if len(manifest.Pages) != 3 || len(manifest.Failures) != 0 {
 		t.Fatalf("unexpected manifest: %#v", manifest)
 	}
-	for _, relativePath := range []string{"Guides/Start.md", "Guides/Start/Child.md", "Guides/Start/Child/Grandchild.md"} {
+	wantPaths := []string{"Guides/Start.md", "Guides/Start/Child.md", "Guides/Start/Child/Grandchild.md"}
+	if len(exportedPaths) != len(wantPaths) {
+		t.Fatalf("export callback paths = %#v, want %#v", exportedPaths, wantPaths)
+	}
+	for index, relativePath := range wantPaths {
+		if exportedPaths[index] != relativePath {
+			t.Errorf("export callback path[%d] = %q, want %q", index, exportedPaths[index], relativePath)
+		}
 		if _, err := os.Stat(filepath.Join(output, filepath.FromSlash(relativePath))); err != nil {
 			t.Errorf("expected exported page %s: %v", relativePath, err)
 		}

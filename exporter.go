@@ -186,11 +186,11 @@ func rewriteMarkdownImages(client *AzureDevOpsClient, pagePath, markdown, output
 	return rewritten, imagePaths
 }
 
-func ExportWiki(client *AzureDevOpsClient, project string, wiki Wiki, outputDirectory, rootFilename string, onPage func(Page)) (ExportManifest, error) {
+func ExportWiki(client *AzureDevOpsClient, project string, wiki Wiki, outputDirectory, rootFilename string, onPage func(Page, string)) (ExportManifest, error) {
 	return ExportWikiFromPage(client, project, wiki, "/", outputDirectory, rootFilename, onPage)
 }
 
-func ExportWikiFromPage(client *AzureDevOpsClient, project string, wiki Wiki, startPage, outputDirectory, rootFilename string, onPage func(Page)) (ExportManifest, error) {
+func ExportWikiFromPage(client *AzureDevOpsClient, project string, wiki Wiki, startPage, outputDirectory, rootFilename string, onPage func(Page, string)) (ExportManifest, error) {
 	manifest := newManifest(client.Organization(), project, wiki, outputDirectory)
 	if _, err := PagePathToLocal(startPage, rootFilename); err != nil {
 		return manifest, err
@@ -222,7 +222,7 @@ func ExportWikiFromPage(client *AzureDevOpsClient, project string, wiki Wiki, st
 						writtenPaths[localPath] = struct{}{}
 						manifest.Pages = append(manifest.Pages, ManifestPage{SourcePath: page.Path, LocalPath: localPath, Order: page.Order, ETag: etag, Images: images})
 						if onPage != nil {
-							onPage(page)
+							onPage(page, localPath)
 						}
 					}
 				}

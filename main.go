@@ -44,7 +44,9 @@ func run(args []string, stdout, stderr io.Writer) int {
 		fmt.Fprintln(stderr, err)
 		return 1
 	}
-	manifest, err := ExportWikiFromPage(client, *project, wiki, *startPage, *output, *rootFilename, nil)
+	manifest, err := ExportWikiFromPage(client, *project, wiki, *startPage, *output, *rootFilename, func(_ Page, localPath string) {
+		fmt.Fprintln(stdout, localPath)
+	})
 	if err != nil {
 		fmt.Fprintln(stderr, err)
 		return 1
