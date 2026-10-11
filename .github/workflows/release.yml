@@ -6,6 +6,7 @@ on:
       - "v*"
 
 permissions:
+  checks: write
   contents: write
 
 jobs:
@@ -21,7 +22,21 @@ jobs:
           go-version-file: go.mod
 
       - name: Run tests
-        run: go test ./...
+        id: tests
+        continue-on-error: true
+        run: go test -json ./... > test-results.json
+
+      - name: Publish test results
+        if: always()
+        uses: dorny/test-reporter@v2
+        with:
+          name: Go Tests
+          path: test-results.json
+          reporter: golang-json
+
+      - name: Fail if tests failed
+        if: always() && steps.tests.outcome == 'failure'
+        run: exit 1
 
       - name: Build release binaries
         run: |

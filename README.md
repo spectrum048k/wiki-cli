@@ -33,4 +33,4 @@ A page such as `/Guides/Setup` is written to `exported-wiki/Guides/Setup.md`. Th
 
 ## Releases
 
-Push a version tag such as `v1.0.0` to run the GitHub Actions release workflow. It runs the tests, builds standalone executables for Apple silicon Macs, Intel Macs, and 64-bit Windows, then attaches them to a GitHub Release.
+Push a version tag such as `v1.0.0` to run the GitHub Actions release workflow. It publishes the Go test results in the workflow's Checks tab, builds standalone executables for Apple silicon Macs, Intel Macs, and 64-bit Windows, then attaches them to a GitHub Release. A failed test run prevents the release from being built.
